@@ -111,7 +111,7 @@ export function HostView({ pin }: { pin: string }) {
   if (gone || data?.phase === "ENDED") {
     const board = data?.leaderboard ?? [];
     return (
-      <main className="relative mx-auto flex min-h-dvh w-full max-w-4xl flex-col items-center justify-center gap-10 px-6 py-10">
+      <main className="relative flex min-h-dvh w-full flex-col items-center justify-center gap-10 px-6 py-10">
         <AmbientBackground />
         {board.length > 0 && <Confetti count={120} loop />}
         <Brand className="text-2xl" />
@@ -146,12 +146,12 @@ export function HostView({ pin }: { pin: string }) {
   };
 
   return (
-    <main className="relative mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-6 py-6">
+    <main className="relative flex min-h-dvh w-full flex-col px-8 py-6 sm:px-12">
       <AmbientBackground />
       <header className="flex items-center justify-between">
         <Brand className="text-xl" />
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-slate-400">{data.quizTitle}</span>
+        <div className="flex items-center gap-3">
+          <span className="mr-1 text-sm text-slate-400">{data.quizTitle}</span>
           <button
             onClick={() => {
               unlockAudio();
@@ -161,6 +161,16 @@ export function HostView({ pin }: { pin: string }) {
             className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-lg ring-1 ring-white/10 transition hover:bg-white/10"
           >
             {muted ? "🔇" : "🔊"}
+          </button>
+          <button
+            onClick={() => {
+              if (document.fullscreenElement) document.exitFullscreen();
+              else document.documentElement.requestFullscreen?.().catch(() => {});
+            }}
+            title="Toggle fullscreen"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-lg ring-1 ring-white/10 transition hover:bg-white/10"
+          >
+            ⛶
           </button>
         </div>
       </header>
