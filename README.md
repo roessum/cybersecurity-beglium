@@ -40,13 +40,16 @@ works on Vercel's serverless model without sticky connections.
 
    No manual variables are required. (For local dev without the integration,
    set `DATABASE_URL` / `DIRECT_URL` yourself — see [`.env.example`](.env.example).)
-2. **Push the schema to Neon once** (run locally, pointed at the direct URL):
+2. **Deploy.** Migrations are applied automatically — the `build` script runs
+   `prisma migrate deploy` before `next build`, and `prisma generate` runs via
+   `postinstall`. So the schema is always in sync on Neon after a deploy.
+3. **Seed the sessions once** (run locally, pointed at Neon — strings from
+   Vercel → Settings → Environment Variables):
    ```bash
-   POSTGRES_URL_NON_POOLING="<neon-unpooled-url>" npx prisma migrate deploy
    DATABASE_URL="<neon-pooled-url>" npm run db:seed
    ```
-   Grab those strings from Vercel → Settings → Environment Variables.
-3. **Deploy.** `prisma generate` runs automatically via the `postinstall` script.
+   The seed is idempotent and non-destructive (upserts by department, leaves live
+   games alone), so it's safe to re-run whenever you change the quiz content.
 
 ### Scale notes
 
