@@ -7,7 +7,14 @@ try {
   // no local .env file (env vars injected by the platform) — fine
 }
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+// Seed does many writes, so prefer the direct (unpooled) connection when
+// available — same precedence as migrations. Falls back to DATABASE_URL locally.
+const connectionString =
+  process.env.POSTGRES_URL_NON_POOLING ??
+  process.env.DIRECT_URL ??
+  process.env.DATABASE_URL;
+
+const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 type SeedQuestion = {
