@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CyberQuiz
 
-## Getting Started
+A Kahoot-style live quiz platform for cybersecurity awareness workshops and
+events. Players join from their phones with a nickname + emoji, a host drives
+the game from a big-screen presentation view, questions are timed, scoring
+rewards speed and correctness, and a live leaderboard/podium closes each game.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 ·
+Prisma 7 + PostgreSQL · SSE for realtime · Vercel + Neon for hosting.
+
+## Local development
 
 ```bash
+npm install
+npm run db:up        # start local Postgres in Docker
+npm run db:migrate   # apply migrations
+npm run db:seed      # load the sample cybersecurity quiz
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Go to `/host` to open a
+game, then join from another tab/phone at `/join` with the PIN.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How realtime works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+There is no websocket server. Postgres is the single source of truth: every
+game mutation bumps a `stateVersion` column, and each client holds an SSE stream
+(`/api/games/[pin]/stream`) that polls that version server-side and pushes a
+fresh snapshot when it changes. `EventSource` reconnects automatically, so this
+works on Vercel's serverless model without sticky connections.
 
-## Learn More
+## Deploying to Vercel + Neon
 
-To learn more about Next.js, take a look at the following resources:
+1. **Create a Neon project** and grab two connection strings from the dashboard:
+   - the **pooled** one (host contains `-pooler`) → for the app runtime
+   - the **direct** one (same host without `-pooler`) → for migrations
+2. **Set env vars** in Vercel (Project → Settings → Environment Variables), see
+   [`.env.example`](.env.example):
+   - `DATABASE_URL` = the **pooled** string (serverless + SSE opens many
+     connections, so pooling is required)
+   - `DIRECT_URL` = the **direct** string
+3. **Run the migration** against Neon once (locally, pointed at Neon):
+   ```bash
+   DIRECT_URL="<neon-direct-url>" npx prisma migrate deploy
+   DIRECT_URL="<neon-direct-url>" DATABASE_URL="<neon-pooled-url>" npm run db:seed
+   ```
+4. **Deploy.** `prisma generate` runs automatically via the `postinstall` script.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Scale notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Each connected client (host + every player) polls Postgres roughly twice a
+second via its SSE stream. For a typical session (≈40 players for ~10 minutes)
+that's light, steady load Neon handles comfortably — but note Neon compute won't
+scale to zero while a game is live. If you ever need to trim load, raise the
+poll interval in [`lib/sse.ts`](lib/sse.ts) (`pollMs`, default 600ms).

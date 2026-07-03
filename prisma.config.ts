@@ -10,6 +10,8 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: env("DATABASE_URL"),
+    // Migrations need a direct (unpooled) connection — PgBouncer's transaction
+    // pooling can't run them. Falls back to DATABASE_URL for local dev.
+    url: process.env.DIRECT_URL ?? env("DATABASE_URL"),
   },
 });
