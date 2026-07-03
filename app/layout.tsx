@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CyberQuiz — Live Cybersecurity Quizzes",
+  title: "MaybeMalware Quiz — Live Cybersecurity Quizzes",
   description:
     "Kahoot-style live quizzes for cybersecurity awareness workshops and events.",
 };

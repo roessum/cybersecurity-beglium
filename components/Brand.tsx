@@ -7,7 +7,7 @@ export function Brand({ className = "" }: { className?: string }) {
         </svg>
       </span>
       <span className="text-lg">
-        Cyber<span className="text-cyan-300">Quiz</span>
+        Maybe<span className="text-cyan-300">Malware</span>
       </span>
     </div>
   );

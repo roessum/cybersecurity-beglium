@@ -1,4 +1,4 @@
-# CyberQuiz
+# MaybeMalware Quiz
 
 A Kahoot-style live quiz platform for cybersecurity awareness workshops and
 events. Players join from their phones with a nickname + emoji, a host drives

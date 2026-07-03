@@ -21,11 +21,19 @@ export default async function HostPage() {
         </Link>
       </header>
 
-      <div>
-        <h1 className="text-3xl font-bold">Host a live session</h1>
-        <p className="mt-1 text-slate-400">
-          Pick a department to open a lobby. Players join from their phones with the PIN.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Host a live session</h1>
+          <p className="mt-1 text-slate-400">
+            Pick a department to open a lobby. Players join from their phones with the PIN.
+          </p>
+        </div>
+        <Link
+          href="/host/new"
+          className="rounded-xl bg-emerald-400 px-5 py-2.5 font-bold text-black transition active:scale-[0.98]"
+        >
+          + Create session
+        </Link>
       </div>
 
       {quizzes.length === 0 ? (

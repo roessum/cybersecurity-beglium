@@ -11,6 +11,10 @@ import { QRJoin } from "@/components/QRJoin";
 import { AvatarGrid } from "@/components/AvatarGrid";
 import { Leaderboard } from "@/components/Leaderboard";
 import { Podium } from "@/components/Podium";
+import { Confetti } from "@/components/Confetti";
+import { AmbientBackground } from "@/components/AmbientBackground";
+import { useHostSounds } from "@/lib/useHostSounds";
+import { unlockAudio } from "@/lib/sound";
 import { answerStyle } from "@/lib/game/answerStyles";
 import type { HostSnapshot } from "@/lib/game/types";
 
@@ -18,6 +22,7 @@ export function HostView({ pin }: { pin: string }) {
   const hydrated = useHydrated();
   const stored = useLocalValue(`host:${pin}`);
   const [busy, setBusy] = useState(false);
+  const [muted, setMuted] = useState(false);
   const busyRef = useRef(false);
 
   const urlToken = hydrated
@@ -35,10 +40,12 @@ export function HostView({ pin }: { pin: string }) {
     ? `/api/games/${pin}/stream?role=host&hostToken=${hostToken}`
     : null;
   const { data, gone } = useGameStream<HostSnapshot>(url);
+  useHostSounds(data ?? null, muted);
 
   const control = useCallback(
     async (action: "advance" | "end") => {
       if (!hostToken || busyRef.current) return;
+      unlockAudio(); // browsers need a gesture before audio can play
       busyRef.current = true;
       setBusy(true);
       try {
@@ -104,7 +111,9 @@ export function HostView({ pin }: { pin: string }) {
   if (gone || data?.phase === "ENDED") {
     const board = data?.leaderboard ?? [];
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col items-center justify-center gap-10 px-6 py-10">
+      <main className="relative mx-auto flex min-h-dvh w-full max-w-4xl flex-col items-center justify-center gap-10 px-6 py-10">
+        <AmbientBackground />
+        {board.length > 0 && <Confetti count={120} loop />}
         <Brand className="text-2xl" />
         <h1 className="text-4xl font-bold">🏆 {data?.quizTitle ?? "Quiz"} — Champions</h1>
         {board.length > 0 && <Podium rows={board} />}
@@ -137,10 +146,23 @@ export function HostView({ pin }: { pin: string }) {
   };
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-6 py-6">
+    <main className="relative mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-6 py-6">
+      <AmbientBackground />
       <header className="flex items-center justify-between">
         <Brand className="text-xl" />
-        <div className="text-sm text-slate-400">{data.quizTitle}</div>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-slate-400">{data.quizTitle}</span>
+          <button
+            onClick={() => {
+              unlockAudio();
+              setMuted((m) => !m);
+            }}
+            title={muted ? "Unmute" : "Mute"}
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-lg ring-1 ring-white/10 transition hover:bg-white/10"
+          >
+            {muted ? "🔇" : "🔊"}
+          </button>
+        </div>
       </header>
 
       <div className="flex flex-1 flex-col justify-center py-6">
@@ -183,6 +205,7 @@ export function HostView({ pin }: { pin: string }) {
               exit={{ opacity: 0, y: -20 }}
               className="flex flex-col gap-6"
             >
+              {data.phase === "REVEAL" && <Confetti key={`c-${data.questionIndex}`} count={60} />}
               <div className="flex items-center justify-between">
                 <span className="rounded-full bg-white/5 px-4 py-1 text-sm ring-1 ring-white/10">
                   Question {data.questionIndex + 1} / {data.totalQuestions}

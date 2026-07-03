@@ -57,11 +57,19 @@ export default async function Home() {
         </section>
 
         <section className="flex flex-col gap-6">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-bold">Choose a session</h2>
-            <p className="text-slate-400">
-              Pick a department to open a lobby. Players join from their phones with the PIN.
-            </p>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-2xl font-bold">Choose a session</h2>
+              <p className="text-slate-400">
+                Pick a department to open a lobby. Players join from their phones with the PIN.
+              </p>
+            </div>
+            <Link
+              href="/host/new"
+              className="rounded-xl bg-emerald-400 px-5 py-2.5 font-bold text-black transition active:scale-[0.98]"
+            >
+              + Create session
+            </Link>
           </div>
 
           {quizzes.length === 0 ? (
@@ -91,7 +99,7 @@ export default async function Home() {
       </main>
 
       <footer className="mx-auto w-full max-w-6xl px-6 py-8 text-center text-sm text-slate-500">
-        CyberQuiz — live cybersecurity awareness quizzes for teams.
+        MaybeMalware Quiz — live cybersecurity awareness quizzes for teams.
       </footer>
     </div>
   );
