@@ -31,20 +31,22 @@ works on Vercel's serverless model without sticky connections.
 
 ## Deploying to Vercel + Neon
 
-1. **Create a Neon project** and grab two connection strings from the dashboard:
-   - the **pooled** one (host contains `-pooler`) → for the app runtime
-   - the **direct** one (same host without `-pooler`) → for migrations
-2. **Set env vars** in Vercel (Project → Settings → Environment Variables), see
-   [`.env.example`](.env.example):
-   - `DATABASE_URL` = the **pooled** string (serverless + SSE opens many
-     connections, so pooling is required)
-   - `DIRECT_URL` = the **direct** string
-3. **Run the migration** against Neon once (locally, pointed at Neon):
+1. **Add the Neon integration** to your Vercel project (Storage → Neon). It
+   auto-injects the env vars for Production/Preview, including:
+   - `DATABASE_URL` — the **pooled** string (`*-pooler.neon.tech`). The app reads
+     this and, seeing a Neon host, uses the Neon serverless driver.
+   - `POSTGRES_URL_NON_POOLING` — the **direct/unpooled** string, used for
+     migrations. `prisma.config.ts` picks it up automatically.
+
+   No manual variables are required. (For local dev without the integration,
+   set `DATABASE_URL` / `DIRECT_URL` yourself — see [`.env.example`](.env.example).)
+2. **Push the schema to Neon once** (run locally, pointed at the direct URL):
    ```bash
-   DIRECT_URL="<neon-direct-url>" npx prisma migrate deploy
-   DIRECT_URL="<neon-direct-url>" DATABASE_URL="<neon-pooled-url>" npm run db:seed
+   POSTGRES_URL_NON_POOLING="<neon-unpooled-url>" npx prisma migrate deploy
+   DATABASE_URL="<neon-pooled-url>" npm run db:seed
    ```
-4. **Deploy.** `prisma generate` runs automatically via the `postinstall` script.
+   Grab those strings from Vercel → Settings → Environment Variables.
+3. **Deploy.** `prisma generate` runs automatically via the `postinstall` script.
 
 ### Scale notes
 

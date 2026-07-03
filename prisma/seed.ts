@@ -1,7 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-process.loadEnvFile?.();
+try {
+  process.loadEnvFile?.();
+} catch {
+  // no local .env file (env vars injected by the platform) — fine
+}
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
