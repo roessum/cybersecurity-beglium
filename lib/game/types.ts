@@ -55,6 +55,8 @@ export type PlayerSnapshot = {
     pointsAwarded: number;
     yourRank: number;
   };
+  /** During REVEAL: why the correct answer matters. */
+  explanation?: string;
   /** During LEADERBOARD / ENDED. */
   leaderboard?: LeaderboardRow[];
   yourRank?: number;
@@ -82,6 +84,8 @@ export type HostSnapshot = {
     perChoice: Record<string, number>;
   };
   correctChoiceId?: string;
+  /** During REVEAL: why the correct answer matters. */
+  explanation?: string;
   leaderboard?: LeaderboardRow[];
 };
 

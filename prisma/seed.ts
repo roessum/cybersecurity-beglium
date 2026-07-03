@@ -19,6 +19,7 @@ const prisma = new PrismaClient({ adapter });
 
 type SeedQuestion = {
   text: string;
+  explanation: string;
   timeLimitSec?: number;
   choices: { text: string; correct?: boolean }[];
 };
@@ -42,6 +43,8 @@ const quizzes: SeedQuiz[] = [
     questions: [
       {
         text: "Someone in a delivery uniform follows you through a badge-only door, hands full. What do you do?",
+        explanation:
+          "This is 'tailgating' — the easiest way for a stranger to get inside. A uniform and full hands are a classic trick. Everyone badges in on their own, no exceptions.",
         choices: [
           { text: "Hold the door — they look busy" },
           { text: "Politely ask them to badge in themselves", correct: true },
@@ -51,6 +54,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "You find a USB stick while cleaning a meeting room. Best action?",
+        explanation:
+          "Attackers deliberately drop infected USB sticks hoping someone plugs them in. A single one can install malware in seconds. Hand it to IT — never plug in a found device.",
         choices: [
           { text: "Plug it into a PC to find the owner" },
           { text: "Keep it for yourself" },
@@ -60,6 +65,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "You leave your workstation for a break. You should…",
+        explanation:
+          "An unlocked screen lets anyone read email, send messages as you, or copy data in seconds. Locking (Win+L / Ctrl+Cmd+Q) takes one keystroke and stops all of it.",
         timeLimitSec: 15,
         choices: [
           { text: "Lock the screen (Win+L / Ctrl+Cmd+Q)", correct: true },
@@ -70,6 +77,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A stranger asks for the door code 'because they forgot theirs'. You…",
+        explanation:
+          "Door codes are only as safe as the people who know them. A friendly excuse is a common social-engineering tactic. Send them to reception to be verified.",
         choices: [
           { text: "Give it — they seem friendly" },
           { text: "Never share door codes; direct them to reception", correct: true },
@@ -79,6 +88,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Printed documents left on a desk overnight are best…",
+        explanation:
+          "A 'clean desk' keeps sensitive paperwork out of sight of cleaners, visitors and after-hours intruders. Lock it away or shred it — don't leave it out.",
         choices: [
           { text: "Left where they are" },
           { text: "Locked away or shredded if sensitive", correct: true },
@@ -88,6 +99,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "You notice someone photographing screens in an empty office. You should…",
+        explanation:
+          "Photographing screens or documents is a way to steal information without touching a keyboard. You don't have to confront them — just report it to security immediately.",
         choices: [
           { text: "Assume it's fine" },
           { text: "Report it to security straight away", correct: true },
@@ -106,6 +119,8 @@ const quizzes: SeedQuiz[] = [
     questions: [
       {
         text: "A caller claims to be 'IT support' and asks you to read out a code sent to your phone. You…",
+        explanation:
+          "That code is a one-time login code. Anyone asking you to read it out is trying to hijack your account — real IT never needs it. Never share verification codes.",
         choices: [
           { text: "Read it out to be helpful" },
           { text: "Refuse — never share verification codes", correct: true },
@@ -115,6 +130,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A visitor arrives for a meeting but isn't on the list. Best step?",
+        explanation:
+          "Verifying with the host takes a minute and stops unauthorised people walking in. 'I have a meeting' is easy to claim — a quick call confirms it.",
         choices: [
           { text: "Wave them through" },
           { text: "Call the host to confirm before granting access", correct: true },
@@ -124,6 +141,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A 'courier' insists on delivering a package directly to the CEO's desk. You…",
+        explanation:
+          "Insisting on going somewhere unescorted is a red flag. Accepting at reception keeps strangers out of sensitive areas — a fake delivery is a known way in.",
         choices: [
           { text: "Escort them up personally" },
           { text: "Accept it at reception and follow normal delivery process", correct: true },
@@ -133,6 +152,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Someone on the phone pressures you with urgency and name-drops an executive. This is a classic sign of…",
+        explanation:
+          "Urgency + authority ('the CEO needs this now') is the signature of social engineering. It's designed to make you skip checks. Slow down and verify.",
         timeLimitSec: 15,
         choices: [
           { text: "A social engineering / pretexting attempt", correct: true },
@@ -143,6 +164,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Visitor badges should be…",
+        explanation:
+          "Logging badges in and out means you always know who's in the building — essential in an emergency and for stopping badge reuse by outsiders.",
         choices: [
           { text: "Kept by visitors as souvenirs" },
           { text: "Returned and logged when the visitor leaves", correct: true },
@@ -152,6 +175,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A caller asks 'who's in today and when does the manager leave?' You…",
+        explanation:
+          "Details about who's in and when people leave help attackers time an intrusion or impersonation. Don't disclose staff movements to unknown callers.",
         choices: [
           { text: "Answer — it's just scheduling" },
           { text: "Don't disclose staff movements to unknown callers", correct: true },
@@ -170,6 +195,8 @@ const quizzes: SeedQuiz[] = [
     questions: [
       {
         text: "A supplier emails that their bank details have changed — pay the new account. Best action?",
+        explanation:
+          "Changed bank details are the #1 sign of invoice fraud. Always verify with a phone number you already have on file — never one from the email, which the attacker controls.",
         choices: [
           { text: "Update and pay immediately" },
           { text: "Verify by calling a known number, not one in the email", correct: true },
@@ -179,6 +206,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "The 'CEO' emails urgently requesting a confidential wire transfer, bypassing normal process. This is…",
+        explanation:
+          "This is Business Email Compromise — attackers impersonate an executive and use urgency + secrecy to push a fraudulent transfer. Real executives follow the process.",
         timeLimitSec: 15,
         choices: [
           { text: "Business Email Compromise (BEC)", correct: true },
@@ -189,6 +218,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "An email from 'accounts@supp1ier.com' (note the digit) is a sign of…",
+        explanation:
+          "Attackers register look-alike domains (a '1' for an 'l') so emails seem genuine. Always check the exact sender domain, character by character.",
         choices: [
           { text: "A rebranding" },
           { text: "A look-alike / spoofed domain", correct: true },
@@ -198,6 +229,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Strongest control against fraudulent payments is…",
+        explanation:
+          "Separating who requests from who approves — plus confirming via a separate channel — means no single person (or hijacked inbox) can move money alone.",
         choices: [
           { text: "Trusting the requester's seniority" },
           { text: "Segregation of duties + out-of-band approval", correct: true },
@@ -207,6 +240,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A vendor requests payment in gift cards. You should…",
+        explanation:
+          "Legitimate vendors never ask for gift cards — they're untraceable and irreversible, which is exactly why scammers love them. Treat it as fraud.",
         choices: [
           { text: "Buy them quietly" },
           { text: "Treat it as a scam — legitimate vendors don't do this", correct: true },
@@ -216,6 +251,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Before a large first-time payment to a new account, you should…",
+        explanation:
+          "A PDF invoice proves nothing — it's trivial to forge. Independently verifying the beneficiary through a trusted channel stops the payment going to a fraudster.",
         choices: [
           { text: "Rely on the invoice PDF" },
           { text: "Independently verify the beneficiary via a trusted channel", correct: true },
@@ -234,6 +271,8 @@ const quizzes: SeedQuiz[] = [
     questions: [
       {
         text: "A job applicant's CV arrives as a macro-enabled document (.docm) asking to 'Enable Content'. You…",
+        explanation:
+          "'Enable Content' runs hidden macros — a very common malware delivery method. A real CV never needs macros. Ask for a PDF or open it in a safe viewer.",
         choices: [
           { text: "Enable content to read it" },
           { text: "Don't enable macros; open safely or request a PDF", correct: true },
@@ -243,6 +282,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "An employee emails asking to change their salary bank account. Best practice?",
+        explanation:
+          "Payroll diversion — attackers hijack an inbox and redirect someone's salary. Verify the request through a second, known channel before changing any bank details.",
         choices: [
           { text: "Update it on the email alone" },
           { text: "Verify the request through a second, known channel", correct: true },
@@ -252,6 +293,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Sharing a spreadsheet of all staff personal data with an external recruiter is…",
+        explanation:
+          "Personal data needs a lawful basis and should be minimised — sharing everyone's details externally is a privacy breach with real legal consequences.",
         timeLimitSec: 20,
         choices: [
           { text: "Fine if they asked nicely" },
@@ -262,6 +305,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Under GDPR-style rules, personal data should be…",
+        explanation:
+          "Data minimisation: only collect what you need and keep it only as long as needed. Less data held means less to lose if there's ever a breach.",
         choices: [
           { text: "Collected as much as possible, just in case" },
           { text: "Limited to what's necessary and kept only as long as needed", correct: true },
@@ -271,6 +316,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A 'candidate' calls asking detailed questions about your internal tools and team structure. This could be…",
+        explanation:
+          "Attackers gather this 'recon' to craft convincing phishing later ('I use the same tools you do'). Stay guarded about internal details with people you can't verify.",
         choices: [
           { text: "Genuine enthusiasm — tell them everything" },
           { text: "Reconnaissance for a later attack — stay guarded", correct: true },
@@ -280,6 +327,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Where should you store a scanned copy of an employee's passport?",
+        explanation:
+          "Identity documents belong in the approved, access-controlled HR system — not on desktops, shared drives or email, where they're easy to leak or steal.",
         choices: [
           { text: "On your desktop for quick access" },
           { text: "In the approved, access-controlled HR system", correct: true },
@@ -298,6 +347,8 @@ const quizzes: SeedQuiz[] = [
     questions: [
       {
         text: "Which best resists modern MFA-phishing (adversary-in-the-middle) proxies?",
+        explanation:
+          "FIDO2/WebAuthn passkeys are bound to the origin, so a phishing proxy can't relay them. TOTP and SMS codes can be captured and replayed in real time.",
         timeLimitSec: 25,
         choices: [
           { text: "SMS one-time codes" },
@@ -308,6 +359,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "You must store user passwords. The right approach is…",
+        explanation:
+          "Passwords should be hashed with a slow, salted algorithm (argon2/bcrypt/scrypt) so leaks aren't reversible and brute-forcing is expensive. Encryption is reversible — wrong tool.",
         choices: [
           { text: "Encrypt them with AES so they're reversible" },
           { text: "Hash with a slow, salted algorithm (argon2/bcrypt/scrypt)", correct: true },
@@ -317,6 +370,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "An API fetches a URL supplied by the user and returns the response. The key risk is…",
+        explanation:
+          "That's SSRF: an attacker makes your server request internal addresses (like cloud metadata endpoints) it shouldn't reach. Validate and allowlist outbound targets.",
         choices: [
           { text: "Cross-site scripting (XSS)" },
           { text: "Server-Side Request Forgery (SSRF)", correct: true },
@@ -326,6 +381,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A secret was accidentally committed and pushed to a repo. First priority is…",
+        explanation:
+          "Once pushed, assume it's captured — bots scan public repos within minutes. Rotate/revoke the secret first; scrubbing git history is secondary and doesn't undo exposure.",
         timeLimitSec: 20,
         choices: [
           { text: "Delete the commit and move on" },
@@ -336,6 +393,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "Best defence against a malicious dependency in your build pipeline?",
+        explanation:
+          "Pinning versions with lockfiles and verifying integrity/provenance stops a tampered or typosquatted package from silently entering your build.",
         choices: [
           { text: "Always use 'latest' tags" },
           { text: "Pin versions + lockfiles + verify integrity/provenance", correct: true },
@@ -345,6 +404,8 @@ const quizzes: SeedQuiz[] = [
       },
       {
         text: "A user reports a MFA push they didn't request, repeatedly. This is likely…",
+        explanation:
+          "This is MFA fatigue / push-bombing: the attacker already has the password and is spamming prompts hoping the user taps 'approve'. Investigate and lock the account down.",
         choices: [
           { text: "A glitch to ignore" },
           { text: "MFA-fatigue / push-bombing — investigate and lock down", correct: true },
@@ -387,6 +448,7 @@ async function main() {
           create: q.questions.map((question, qi) => ({
             order: qi,
             text: question.text,
+            explanation: question.explanation,
             timeLimitSec: question.timeLimitSec ?? 20,
             choices: {
               create: question.choices.map((c, ci) => ({

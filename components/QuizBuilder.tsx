@@ -12,11 +12,17 @@ const ICONS = [
 const DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"] as const;
 
 type ChoiceDraft = { text: string; correct: boolean };
-type QuestionDraft = { text: string; timeLimitSec: number; choices: ChoiceDraft[] };
+type QuestionDraft = {
+  text: string;
+  explanation: string;
+  timeLimitSec: number;
+  choices: ChoiceDraft[];
+};
 
 function newQuestion(): QuestionDraft {
   return {
     text: "",
+    explanation: "",
     timeLimitSec: 20,
     choices: [
       { text: "", correct: true },
@@ -86,6 +92,7 @@ export function QuizBuilder() {
     // Trim empty trailing choices, validate.
     const payloadQuestions = questions.map((q) => ({
       text: q.text.trim(),
+      explanation: q.explanation.trim() || null,
       timeLimitSec: q.timeLimitSec,
       choices: q.choices
         .map((c) => ({ text: c.text.trim(), correct: c.correct }))
@@ -255,6 +262,13 @@ export function QuizBuilder() {
                   );
                 })}
               </div>
+
+              <textarea
+                className={`${input} min-h-16 resize-y`}
+                value={q.explanation}
+                onChange={(e) => updateQuestion(qi, { explanation: e.target.value })}
+                placeholder="Why this matters (shown to everyone after the answer) — optional"
+              />
 
               <div className="flex items-center justify-between">
                 {q.choices.length < 4 ? (

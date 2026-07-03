@@ -146,6 +146,14 @@ export function PlayerGame({ pin }: { pin: string }) {
               <p className="text-slate-400">
                 You&apos;re #{data.result.yourRank} · {data.you.score.toLocaleString()} pts
               </p>
+              {data.explanation && (
+                <div className="mt-3 rounded-2xl bg-cyan-400/10 p-4 text-left ring-1 ring-cyan-400/25">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-cyan-300">
+                    Why this matters
+                  </p>
+                  <p className="text-sm text-slate-100">{data.explanation}</p>
+                </div>
+              )}
             </Panel>
           )}
 

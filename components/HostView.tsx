@@ -264,6 +264,20 @@ export function HostView({ pin }: { pin: string }) {
                   );
                 })}
               </div>
+
+              {data.phase === "REVEAL" && data.explanation && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="mx-auto max-w-3xl rounded-2xl bg-cyan-400/10 p-5 text-center ring-1 ring-cyan-400/25"
+                >
+                  <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-cyan-300">
+                    Why this matters
+                  </p>
+                  <p className="text-lg text-slate-100">{data.explanation}</p>
+                </motion.div>
+              )}
             </motion.div>
           )}
 

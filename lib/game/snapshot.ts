@@ -120,6 +120,7 @@ export async function buildHostSnapshot(pin: string): Promise<HostSnapshot | nul
 
   if (game.status === "REVEAL") {
     snap.correctChoiceId = correctChoiceId(core);
+    if (currentQuestion?.explanation) snap.explanation = currentQuestion.explanation;
   }
 
   if (game.status === "LEADERBOARD" || game.status === "ENDED") {
@@ -177,6 +178,7 @@ export async function buildPlayerSnapshot(
       pointsAwarded: mine?.pointsAwarded ?? 0,
       yourRank: board.find((r) => r.playerId === playerId)?.rank ?? game.players.length,
     };
+    if (currentQuestion.explanation) snap.explanation = currentQuestion.explanation;
   }
 
   if (game.status === "LEADERBOARD" || game.status === "ENDED") {

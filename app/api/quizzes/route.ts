@@ -12,6 +12,7 @@ const choiceSchema = z.object({
 
 const questionSchema = z.object({
   text: z.string().trim().min(1, "Question text is required").max(240),
+  explanation: z.string().trim().max(400).optional().nullable(),
   timeLimitSec: z.number().int().min(5).max(120).default(20),
   choices: z
     .array(choiceSchema)
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
           create: body.questions.map((q, qi) => ({
             order: qi,
             text: q.text,
+            explanation: q.explanation?.trim() || null,
             timeLimitSec: q.timeLimitSec,
             choices: {
               create: q.choices.map((c, ci) => ({

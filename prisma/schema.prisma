@@ -32,6 +32,7 @@ model Question {
   quiz         Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
   order        Int
   text         String
+  explanation  String?
   timeLimitSec Int           @default(20)
   basePoints   Int           @default(1000)
   choices      Choice[]
