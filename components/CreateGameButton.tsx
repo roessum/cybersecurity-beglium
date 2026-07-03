@@ -3,7 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function CreateGameButton({ quizId }: { quizId: string }) {
+export function CreateGameButton({
+  quizId,
+  label = "Start hosting",
+}: {
+  quizId: string;
+  label?: string;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +44,7 @@ export function CreateGameButton({ quizId }: { quizId: string }) {
         disabled={busy}
         className="rounded-xl bg-cyan-400 px-6 py-2.5 font-bold text-black transition active:scale-[0.98] disabled:opacity-50"
       >
-        {busy ? "Starting…" : "Start hosting"}
+        {busy ? "Starting…" : label}
       </button>
       {error && <span className="text-sm text-rose-400">{error}</span>}
     </div>

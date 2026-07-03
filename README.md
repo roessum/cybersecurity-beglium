@@ -14,7 +14,7 @@ Prisma 7 + PostgreSQL · SSE for realtime · Vercel + Neon for hosting.
 npm install
 npm run db:up        # start local Postgres in Docker
 npm run db:migrate   # apply migrations
-npm run db:seed      # load the sample cybersecurity quiz
+npm run db:seed      # load the department sessions (Cleaning … Red Team)
 npm run dev
 ```
 

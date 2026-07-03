@@ -18,6 +18,9 @@ model Quiz {
   id          String     @id @default(cuid())
   title       String
   description String?
+  department  String?    @unique
+  icon        String?
+  difficulty  String?
   createdAt   DateTime   @default(now())
   questions   Question[]
   games       Game[]
