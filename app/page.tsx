@@ -107,6 +107,7 @@ export default async function Home() {
                     description: s.description,
                     icon: s.icon,
                     difficulty: s.difficulty,
+                    unit: s.unit,
                     visibleWords: s.visibleWords,
                     targetWords: s.targetWords,
                     turnSeconds: s.turnSeconds,

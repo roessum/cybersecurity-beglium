@@ -10,8 +10,12 @@ export type Phase =
 
 export type GameKind = "QUIZ" | "STORY";
 
+/** Whether a story turn adds a single word or a whole sentence. */
+export type StoryUnit = "WORD" | "SENTENCE";
+
 /** Host-side view of the word-story game. */
 export type StoryHostState = {
+  unit: StoryUnit;
   wordCount: number;
   targetWords: number | null;
   /** Per-turn time limit in seconds, or null for unlimited. */
@@ -26,8 +30,9 @@ export type StoryHostState = {
 
 /** Player-side view of the word-story game. */
 export type StoryPlayerState = {
+  unit: StoryUnit;
   yourTurn: boolean;
-  /** The last N words, oldest→newest. Only meaningful while it's your turn. */
+  /** The last N items (words or sentences), oldest→newest. Only meaningful while it's your turn. */
   visibleWords: string[];
   wordCount: number;
   targetWords: number | null;

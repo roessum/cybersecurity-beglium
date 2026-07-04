@@ -12,6 +12,7 @@ export type StorySummary = {
   description: string | null;
   icon: string | null;
   difficulty: string | null;
+  unit: "WORD" | "SENTENCE";
   visibleWords: number;
   targetWords: number | null;
   turnSeconds: number | null;
@@ -21,6 +22,7 @@ export function StoryCard({ story }: { story: StorySummary }) {
   const badge = story.difficulty
     ? (DIFFICULTY_STYLES[story.difficulty] ?? "bg-white/10 text-slate-300 ring-white/20")
     : null;
+  const noun = story.unit === "SENTENCE" ? "sentence" : "word";
 
   return (
     <div className="flex flex-col rounded-2xl bg-white/5 p-6 ring-1 ring-white/10 transition hover:ring-white/20">
@@ -35,11 +37,14 @@ export function StoryCard({ story }: { story: StorySummary }) {
         <p className="mt-2 flex-1 text-sm text-slate-400">{story.description}</p>
       )}
       <div className="mt-3 flex flex-wrap gap-2 text-xs">
-        <span className="rounded-full bg-white/5 px-3 py-1 text-slate-300 ring-1 ring-white/10">
-          👀 sees {story.visibleWords} word{story.visibleWords === 1 ? "" : "s"}
+        <span className="rounded-full bg-fuchsia-400/10 px-3 py-1 text-fuchsia-300 ring-1 ring-fuchsia-400/25">
+          {story.unit === "SENTENCE" ? "📝 sentence" : "✏️ word"} by {noun}
         </span>
         <span className="rounded-full bg-white/5 px-3 py-1 text-slate-300 ring-1 ring-white/10">
-          {story.targetWords ? `🏁 ${story.targetWords} words` : "♾️ host stops"}
+          👀 sees {story.visibleWords} {noun}{story.visibleWords === 1 ? "" : "s"}
+        </span>
+        <span className="rounded-full bg-white/5 px-3 py-1 text-slate-300 ring-1 ring-white/10">
+          {story.targetWords ? `🏁 ${story.targetWords} ${noun}s` : "♾️ host stops"}
         </span>
         {story.turnSeconds && (
           <span className="rounded-full bg-white/5 px-3 py-1 text-slate-300 ring-1 ring-white/10">

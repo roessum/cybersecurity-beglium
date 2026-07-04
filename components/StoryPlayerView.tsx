@@ -23,8 +23,10 @@ export function StoryPlayerView({
 
   // Reset the input whenever it stops being our turn (a new turn = fresh field).
   const yourTurn = data.phase === "WRITING" && !!story?.yourTurn;
+  const sentence = story?.unit === "SENTENCE";
+  const noun = sentence ? "sentence" : "word";
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: { preventDefault: () => void }) {
     e.preventDefault();
     const clean = word.trim();
     if (!clean || submittingRef.current || !yourTurn) return;
@@ -90,35 +92,50 @@ export function StoryPlayerView({
                 {story && story.visibleWords.length > 0 ? (
                   <>
                     <p className="text-xs uppercase tracking-wide text-slate-500">
-                      {story.visibleWords.length === 1 ? "Previous word" : "Last words"}
+                      {story.visibleWords.length === 1 ? `Previous ${noun}` : `Last ${noun}s`}
                     </p>
-                    <p className="mt-1 text-2xl font-bold">
+                    <p className={`mt-1 font-bold ${sentence ? "text-lg" : "text-2xl"}`}>
                       {story.visibleWords.join(" ")}
                     </p>
                   </>
                 ) : (
                   <p className="text-lg text-slate-300">
-                    You start the story — write the first word!
+                    You start the story — write the first {noun}!
                   </p>
                 )}
               </div>
 
               <form onSubmit={submit} className="mt-2 flex flex-col gap-3">
-                <input
-                  autoFocus
-                  value={word}
-                  onChange={(e) => setWord(e.target.value)}
-                  placeholder="One word…"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  className="w-full rounded-2xl bg-white/5 px-5 py-4 text-center text-2xl outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-cyan-400"
-                />
+                {sentence ? (
+                  <textarea
+                    autoFocus
+                    value={word}
+                    onChange={(e) => setWord(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) submit(e);
+                    }}
+                    placeholder="Write a sentence…"
+                    rows={2}
+                    maxLength={280}
+                    className="w-full resize-none rounded-2xl bg-white/5 px-5 py-4 text-lg outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-cyan-400"
+                  />
+                ) : (
+                  <input
+                    autoFocus
+                    value={word}
+                    onChange={(e) => setWord(e.target.value)}
+                    placeholder="One word…"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    className="w-full rounded-2xl bg-white/5 px-5 py-4 text-center text-2xl outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-cyan-400"
+                  />
+                )}
                 <button
                   type="submit"
                   disabled={!word.trim()}
                   className="rounded-2xl bg-cyan-400 py-4 text-lg font-bold text-black transition active:scale-[0.98] disabled:opacity-50"
                 >
-                  Add word →
+                  Add {noun} →
                 </button>
                 {error && <p className="text-center text-sm text-rose-400">{error}</p>}
               </form>
@@ -133,7 +150,10 @@ export function StoryPlayerView({
                   ? `${story.currentWriter.emoji} ${story.currentWriter.nickname} is writing…`
                   : "Someone is writing…"}
               </h2>
-              <p className="text-slate-400">{story?.wordCount ?? 0} words so far</p>
+              <p className="text-slate-400">
+                {story?.wordCount ?? 0} {noun}
+                {(story?.wordCount ?? 0) === 1 ? "" : "s"} so far
+              </p>
               <p className="text-sm text-slate-500">Get ready — your turn is coming!</p>
             </Panel>
           )}
@@ -149,7 +169,8 @@ export function StoryPlayerView({
                 )}
               </div>
               <p className="text-center text-sm text-slate-500">
-                {story?.wordCount ?? 0} words · {data.playerCount} authors
+                {story?.wordCount ?? 0} {noun}
+                {(story?.wordCount ?? 0) === 1 ? "" : "s"} · {data.playerCount} authors
               </p>
               <Link href="/" className="mt-2 text-center text-cyan-300 underline">
                 Back home

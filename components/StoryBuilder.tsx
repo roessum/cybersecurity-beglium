@@ -15,6 +15,7 @@ export function StoryBuilder() {
   const [description, setDescription] = useState("");
   const [icon, setIcon] = useState("📖");
   const [difficulty, setDifficulty] = useState<(typeof DIFFICULTIES)[number]>("Beginner");
+  const [unit, setUnit] = useState<"WORD" | "SENTENCE">("WORD");
   const [visibleWords, setVisibleWords] = useState(1);
   const [hasTarget, setHasTarget] = useState(true);
   const [targetWords, setTargetWords] = useState(30);
@@ -40,6 +41,7 @@ export function StoryBuilder() {
           description: description.trim() || null,
           icon,
           difficulty,
+          unit,
           visibleWords,
           targetWords: hasTarget ? targetWords : null,
           turnSeconds: hasTimer ? turnSeconds : null,
@@ -123,8 +125,38 @@ export function StoryBuilder() {
 
         <div className="flex flex-col gap-2">
           <span className="text-sm text-slate-400">
-            Words the writer can see — how many of the most recent words to reveal on
-            each turn. Fewer = more chaos.
+            Each turn a player adds…
+          </span>
+          <div className="grid grid-cols-2 gap-2">
+            {(
+              [
+                { id: "WORD", icon: "✏️", label: "One word", blurb: "Classic chaos" },
+                { id: "SENTENCE", icon: "📝", label: "A whole sentence", blurb: "Reads like a story" },
+              ] as const
+            ).map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setUnit(m.id)}
+                className={`flex flex-col items-start gap-0.5 rounded-xl p-3 text-left ring-1 transition ${
+                  unit === m.id
+                    ? "bg-cyan-400/15 ring-2 ring-cyan-400"
+                    : "bg-white/5 ring-white/10 hover:bg-white/10"
+                }`}
+              >
+                <span className="text-lg">{m.icon}</span>
+                <span className="font-semibold">{m.label}</span>
+                <span className="text-xs text-slate-400">{m.blurb}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-slate-400">
+            {unit === "SENTENCE" ? "Sentences" : "Words"} the writer can see — how many of
+            the most recent {unit === "SENTENCE" ? "sentences" : "words"} to reveal on each
+            turn. Fewer = more chaos.
           </span>
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((n) => (
@@ -152,7 +184,7 @@ export function StoryBuilder() {
               onChange={(e) => setHasTarget(e.target.checked)}
               className="h-4 w-4 accent-cyan-400"
             />
-            Stop automatically at a word count
+            Stop automatically at a {unit === "SENTENCE" ? "sentence" : "word"} count
           </label>
           {hasTarget && (
             <label className="flex items-center gap-2 text-sm text-slate-400">
@@ -167,7 +199,7 @@ export function StoryBuilder() {
                 }
                 className="w-20 rounded-lg bg-white/5 px-2 py-1 text-center ring-1 ring-white/10 focus:ring-2 focus:ring-cyan-400"
               />
-              words
+              {unit === "SENTENCE" ? "sentences" : "words"}
             </label>
           )}
           {!hasTarget && (

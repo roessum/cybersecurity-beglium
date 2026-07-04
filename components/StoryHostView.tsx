@@ -25,6 +25,7 @@ export function StoryHostView({
   const count = story?.wordCount ?? 0;
   const turnSeconds = story?.turnSeconds ?? null;
   const turnStartedAt = story?.turnStartedAt;
+  const noun = story?.unit === "SENTENCE" ? "sentence" : "word";
 
   // The host big screen drives the per-turn timer: when it runs out, skip to the
   // next player. Keyed on turnStartedAt so it fires at most once per turn.
@@ -54,7 +55,10 @@ export function StoryHostView({
         <Confetti count={120} loop />
         <Brand className="text-2xl" />
         <h1 className="text-4xl font-bold">📖 {data.quizTitle}</h1>
-        <p className="text-slate-400">{count} words · {data.playerCount} authors</p>
+        <p className="text-slate-400">
+          {count} {noun}
+          {count === 1 ? "" : "s"} · {data.playerCount} authors
+        </p>
         <div className="max-h-[55vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white/5 p-8 text-2xl leading-relaxed ring-1 ring-white/10">
           {story?.fullStory ? (
             <p>
@@ -136,7 +140,7 @@ export function StoryHostView({
               <div>
                 <p className="text-8xl font-black tabular-nums text-white sm:text-9xl">{count}</p>
                 <p className="mt-1 text-lg text-slate-400">
-                  {target ? `words of ${target}` : "words so far"}
+                  {target ? `${noun}s of ${target}` : `${noun}s so far`}
                 </p>
               </div>
 

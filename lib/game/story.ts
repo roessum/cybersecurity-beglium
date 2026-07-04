@@ -5,8 +5,11 @@ import type { HostSnapshot, PlayerSnapshot } from "@/lib/game/types";
 
 /** A single word may not contain whitespace (one word per turn) and is length-capped. */
 export const MAX_WORD_LENGTH = 40;
+/** A sentence may contain spaces but is still length-capped. */
+export const MAX_SENTENCE_LENGTH = 280;
 
-export function cleanWord(raw: string): string {
+/** Trim and collapse internal whitespace to single spaces. */
+export function cleanEntry(raw: string): string {
   return raw.trim().replace(/\s+/g, " ");
 }
 
@@ -44,24 +47,30 @@ function nextPlayerId(players: { id: string }[], currentId: string | null): stri
   return players[next].id;
 }
 
-/** The active player adds one word, then the turn passes to the next player. */
+/** The active player adds one word or sentence, then the turn passes on. */
 export async function submitWord(pin: string, playerId: string, rawWord: string) {
-  const word = cleanWord(rawWord);
-  if (!word) throw new GameError("Write a word first", 400);
-  if (/\s/.test(word)) throw new GameError("One word at a time, please", 400);
-  if (word.length > MAX_WORD_LENGTH) throw new GameError("That word is too long", 400);
+  const text = cleanEntry(rawWord);
+  if (!text) throw new GameError("Write something first", 400);
 
   const game = await prisma.game.findUnique({
     where: { pin },
     include: {
-      story: { select: { targetWords: true } },
+      story: { select: { targetWords: true, unit: true } },
       players: { orderBy: { joinedAt: "asc" }, select: { id: true } },
     },
   });
   if (!game) throw new GameError("Game not found", 404);
-  if (game.kind !== "STORY") throw new GameError("Not a story game", 400);
-  if (game.status !== "WRITING") throw new GameError("Not accepting words right now", 409);
+  if (game.kind !== "STORY" || !game.story) throw new GameError("Not a story game", 400);
+  if (game.status !== "WRITING") throw new GameError("Not accepting entries right now", 409);
   if (game.currentTurnPlayerId !== playerId) throw new GameError("It's not your turn", 409);
+
+  if (game.story.unit === "WORD") {
+    if (/\s/.test(text)) throw new GameError("One word at a time, please", 400);
+    if (text.length > MAX_WORD_LENGTH) throw new GameError("That word is too long", 400);
+  } else if (text.length > MAX_SENTENCE_LENGTH) {
+    throw new GameError("That sentence is too long", 400);
+  }
+  const word = text;
 
   const count = await prisma.storyWord.count({ where: { gameId: game.id } });
   const nextCount = count + 1;
@@ -158,6 +167,7 @@ export async function buildStoryHostSnapshot(pin: string): Promise<HostSnapshot 
       score: p.score,
     })),
     story: {
+      unit: game.story.unit,
       wordCount: game.storyWords.length,
       targetWords: game.story.targetWords,
       turnSeconds: game.story.turnSeconds,
@@ -198,6 +208,7 @@ export async function buildStoryPlayerSnapshot(
     playerCount: game.players.length,
     you: { id: you.id, nickname: you.nickname, emoji: you.emoji, score: you.score },
     story: {
+      unit: game.story.unit,
       yourTurn,
       visibleWords: visible,
       wordCount: game.storyWords.length,

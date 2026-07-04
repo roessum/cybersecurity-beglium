@@ -20,6 +20,11 @@ enum GameKind {
   STORY
 }
 
+enum StoryUnit {
+  WORD
+  SENTENCE
+}
+
 model Quiz {
   id          String     @id @default(cuid())
   title       String
@@ -65,7 +70,10 @@ model Story {
   description  String?
   icon         String?
   difficulty   String?
-  /// How many trailing words the current writer can see (1 = only the previous word).
+  /// Whether each turn adds a single word or a whole sentence.
+  unit         StoryUnit @default(WORD)
+  /// How many trailing items (words or sentences) the current writer can see
+  /// (1 = only the previous one).
   visibleWords Int      @default(1)
   /// Optional word count at which the story auto-ends. Null = host stops manually.
   targetWords  Int?
