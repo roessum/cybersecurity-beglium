@@ -109,6 +109,7 @@ export default async function Home() {
                     difficulty: s.difficulty,
                     visibleWords: s.visibleWords,
                     targetWords: s.targetWords,
+                    turnSeconds: s.turnSeconds,
                   }}
                 />
               ))}

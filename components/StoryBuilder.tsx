@@ -18,6 +18,8 @@ export function StoryBuilder() {
   const [visibleWords, setVisibleWords] = useState(1);
   const [hasTarget, setHasTarget] = useState(true);
   const [targetWords, setTargetWords] = useState(30);
+  const [hasTimer, setHasTimer] = useState(false);
+  const [turnSeconds, setTurnSeconds] = useState(15);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -26,6 +28,7 @@ export function StoryBuilder() {
     setError(null);
     if (!title.trim()) return setError("Give your story a title");
     if (hasTarget && targetWords < 2) return setError("Target must be at least 2 words");
+    if (hasTimer && turnSeconds < 5) return setError("Turn timer must be at least 5 seconds");
 
     setBusy(true);
     try {
@@ -39,6 +42,7 @@ export function StoryBuilder() {
           difficulty,
           visibleWords,
           targetWords: hasTarget ? targetWords : null,
+          turnSeconds: hasTimer ? turnSeconds : null,
         }),
       });
       const data = await res.json();
@@ -170,6 +174,34 @@ export function StoryBuilder() {
             <span className="text-xs text-slate-500">
               The host ends the story whenever they like from the big screen.
             </span>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center gap-2 text-sm text-slate-300">
+            <input
+              type="checkbox"
+              checked={hasTimer}
+              onChange={(e) => setHasTimer(e.target.checked)}
+              className="h-4 w-4 accent-cyan-400"
+            />
+            Turn timer — skip a player if they don&apos;t write in time
+          </label>
+          {hasTimer && (
+            <label className="flex items-center gap-2 text-sm text-slate-400">
+              Skip after
+              <input
+                type="number"
+                min={5}
+                max={120}
+                value={turnSeconds}
+                onChange={(e) =>
+                  setTurnSeconds(Math.max(5, Math.min(120, Number(e.target.value) || 5)))
+                }
+                className="w-20 rounded-lg bg-white/5 px-2 py-1 text-center ring-1 ring-white/10 focus:ring-2 focus:ring-cyan-400"
+              />
+              seconds
+            </label>
           )}
         </div>
       </section>

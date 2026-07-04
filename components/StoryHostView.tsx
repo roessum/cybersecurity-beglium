@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { Brand } from "@/components/Brand";
 import { QRJoin } from "@/components/QRJoin";
 import { AvatarGrid } from "@/components/AvatarGrid";
+import { Timer } from "@/components/Timer";
 import { Confetti } from "@/components/Confetti";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import type { HostSnapshot } from "@/lib/game/types";
@@ -21,6 +23,28 @@ export function StoryHostView({
   const story = data.story;
   const target = story?.targetWords ?? null;
   const count = story?.wordCount ?? 0;
+  const turnSeconds = story?.turnSeconds ?? null;
+  const turnStartedAt = story?.turnStartedAt;
+
+  // The host big screen drives the per-turn timer: when it runs out, skip to the
+  // next player. Keyed on turnStartedAt so it fires at most once per turn.
+  const skippedRef = useRef<number>(0);
+  useEffect(() => {
+    if (data.phase !== "WRITING" || !turnSeconds || turnStartedAt == null) return;
+    if (skippedRef.current === turnStartedAt) return;
+    const msLeft = turnStartedAt + turnSeconds * 1000 - Date.now();
+    const fire = () => {
+      if (skippedRef.current === turnStartedAt) return;
+      skippedRef.current = turnStartedAt;
+      control("skip");
+    };
+    if (msLeft <= 0) {
+      fire();
+      return;
+    }
+    const t = setTimeout(fire, msLeft);
+    return () => clearTimeout(t);
+  }, [data.phase, turnSeconds, turnStartedAt, control]);
 
   // ENDED — the big reveal.
   if (data.phase === "ENDED") {
@@ -123,6 +147,10 @@ export function StoryHostView({
                     style={{ width: `${Math.min(100, (count / target) * 100)}%` }}
                   />
                 </div>
+              )}
+
+              {turnSeconds && turnStartedAt != null && (
+                <Timer startedAt={turnStartedAt} timeLimitSec={turnSeconds} size={72} />
               )}
 
               {story?.currentWriter ? (

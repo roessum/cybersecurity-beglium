@@ -14,6 +14,7 @@ export type StorySummary = {
   difficulty: string | null;
   visibleWords: number;
   targetWords: number | null;
+  turnSeconds: number | null;
 };
 
 export function StoryCard({ story }: { story: StorySummary }) {
@@ -40,6 +41,11 @@ export function StoryCard({ story }: { story: StorySummary }) {
         <span className="rounded-full bg-white/5 px-3 py-1 text-slate-300 ring-1 ring-white/10">
           {story.targetWords ? `🏁 ${story.targetWords} words` : "♾️ host stops"}
         </span>
+        {story.turnSeconds && (
+          <span className="rounded-full bg-white/5 px-3 py-1 text-slate-300 ring-1 ring-white/10">
+            ⏱️ {story.turnSeconds}s / turn
+          </span>
+        )}
         {story.difficulty && badge && (
           <span className={`rounded-full px-3 py-1 font-medium ring-1 ${badge}`}>
             {story.difficulty}

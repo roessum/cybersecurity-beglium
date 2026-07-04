@@ -14,6 +14,10 @@ export type GameKind = "QUIZ" | "STORY";
 export type StoryHostState = {
   wordCount: number;
   targetWords: number | null;
+  /** Per-turn time limit in seconds, or null for unlimited. */
+  turnSeconds: number | null;
+  /** When the current turn started (epoch ms), for the countdown. */
+  turnStartedAt?: number;
   /** Who is writing right now (WRITING phase). */
   currentWriter?: { nickname: string; emoji: string };
   /** The full assembled story — only sent once the game has ENDED. */
@@ -27,6 +31,10 @@ export type StoryPlayerState = {
   visibleWords: string[];
   wordCount: number;
   targetWords: number | null;
+  /** Per-turn time limit in seconds, or null for unlimited. */
+  turnSeconds: number | null;
+  /** When the current turn started (epoch ms), for the countdown. */
+  turnStartedAt?: number;
   currentWriter?: { nickname: string; emoji: string };
   /** The full assembled story — only sent once the game has ENDED. */
   fullStory?: string;

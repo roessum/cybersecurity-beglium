@@ -69,6 +69,9 @@ model Story {
   visibleWords Int      @default(1)
   /// Optional word count at which the story auto-ends. Null = host stops manually.
   targetWords  Int?
+  /// Optional per-turn time limit in seconds. When it runs out the turn is
+  /// skipped to the next player. Null = players have unlimited time.
+  turnSeconds  Int?
   createdAt    DateTime @default(now())
   games        Game[]
 }
@@ -86,6 +89,8 @@ model Game {
   questionStartedAt    DateTime?
   /// STORY: the player whose turn it is to add the next word.
   currentTurnPlayerId  String?
+  /// STORY: when the current turn began (drives the per-turn timer).
+  turnStartedAt        DateTime?
   stateVersion         Int        @default(0)
   hostToken            String
   createdAt            DateTime   @default(now())

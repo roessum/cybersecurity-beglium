@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { Brand } from "@/components/Brand";
+import { Timer } from "@/components/Timer";
 import type { PlayerSnapshot } from "@/lib/game/types";
 
 export function StoryPlayerView({
@@ -76,6 +77,15 @@ export function StoryPlayerView({
               <p className="text-center text-sm font-semibold uppercase tracking-wide text-cyan-300">
                 Your turn ✍️
               </p>
+              {story?.turnSeconds && story.turnStartedAt != null && (
+                <div className="flex justify-center">
+                  <Timer
+                    startedAt={story.turnStartedAt}
+                    timeLimitSec={story.turnSeconds}
+                    size={64}
+                  />
+                </div>
+              )}
               <div className="rounded-2xl bg-white/5 p-5 text-center ring-1 ring-white/10">
                 {story && story.visibleWords.length > 0 ? (
                   <>

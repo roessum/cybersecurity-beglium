@@ -11,6 +11,7 @@ const schema = z.object({
   difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]).optional().nullable(),
   visibleWords: z.number().int().min(1).max(5).default(1),
   targetWords: z.number().int().min(2).max(500).optional().nullable(),
+  turnSeconds: z.number().int().min(5).max(120).optional().nullable(),
 });
 
 export async function POST(req: Request) {
@@ -24,6 +25,7 @@ export async function POST(req: Request) {
         difficulty: body.difficulty ?? null,
         visibleWords: body.visibleWords,
         targetWords: body.targetWords ?? null,
+        turnSeconds: body.turnSeconds ?? null,
       },
     });
     return Response.json({ id: story.id }, { status: 201 });

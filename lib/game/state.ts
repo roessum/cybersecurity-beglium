@@ -82,6 +82,7 @@ export async function advanceGame(pin: string, hostToken: string) {
       data: {
         status: "WRITING",
         currentTurnPlayerId: game.players[0].id,
+        turnStartedAt: new Date(),
         stateVersion: { increment: 1 },
       },
     });

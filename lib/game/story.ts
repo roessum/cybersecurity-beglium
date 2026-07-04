@@ -78,6 +78,7 @@ export async function submitWord(pin: string, playerId: string, rawWord: string)
       where: { id: game.id },
       data: {
         currentTurnPlayerId: nextTurn,
+        turnStartedAt: reachedTarget ? null : new Date(),
         status: reachedTarget ? "ENDED" : "WRITING",
         stateVersion: { increment: 1 },
       },
@@ -100,7 +101,11 @@ export async function skipTurn(pin: string, hostToken: string) {
   const nextTurn = nextPlayerId(game.players, game.currentTurnPlayerId);
   await prisma.game.update({
     where: { id: game.id },
-    data: { currentTurnPlayerId: nextTurn, stateVersion: { increment: 1 } },
+    data: {
+      currentTurnPlayerId: nextTurn,
+      turnStartedAt: new Date(),
+      stateVersion: { increment: 1 },
+    },
   });
 }
 
@@ -155,6 +160,9 @@ export async function buildStoryHostSnapshot(pin: string): Promise<HostSnapshot 
     story: {
       wordCount: game.storyWords.length,
       targetWords: game.story.targetWords,
+      turnSeconds: game.story.turnSeconds,
+      turnStartedAt:
+        game.status === "WRITING" ? (game.turnStartedAt?.getTime() ?? undefined) : undefined,
       currentWriter: game.status === "WRITING" ? writerOf(game) : undefined,
       // Keep the story hidden until the reveal.
       fullStory: game.status === "ENDED" ? assembleStory(game.storyWords) : undefined,
@@ -194,6 +202,9 @@ export async function buildStoryPlayerSnapshot(
       visibleWords: visible,
       wordCount: game.storyWords.length,
       targetWords: game.story.targetWords,
+      turnSeconds: game.story.turnSeconds,
+      turnStartedAt:
+        game.status === "WRITING" ? (game.turnStartedAt?.getTime() ?? undefined) : undefined,
       currentWriter: game.status === "WRITING" ? writerOf(game) : undefined,
       fullStory: game.status === "ENDED" ? assembleStory(game.storyWords) : undefined,
     },
