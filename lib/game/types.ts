@@ -1,6 +1,36 @@
 // Shared snapshot types sent over SSE to player and host clients.
 
-export type Phase = "LOBBY" | "QUESTION" | "REVEAL" | "LEADERBOARD" | "ENDED";
+export type Phase =
+  | "LOBBY"
+  | "QUESTION"
+  | "REVEAL"
+  | "LEADERBOARD"
+  | "WRITING"
+  | "ENDED";
+
+export type GameKind = "QUIZ" | "STORY";
+
+/** Host-side view of the word-story game. */
+export type StoryHostState = {
+  wordCount: number;
+  targetWords: number | null;
+  /** Who is writing right now (WRITING phase). */
+  currentWriter?: { nickname: string; emoji: string };
+  /** The full assembled story — only sent once the game has ENDED. */
+  fullStory?: string;
+};
+
+/** Player-side view of the word-story game. */
+export type StoryPlayerState = {
+  yourTurn: boolean;
+  /** The last N words, oldest→newest. Only meaningful while it's your turn. */
+  visibleWords: string[];
+  wordCount: number;
+  targetWords: number | null;
+  currentWriter?: { nickname: string; emoji: string };
+  /** The full assembled story — only sent once the game has ENDED. */
+  fullStory?: string;
+};
 
 export type PublicChoice = {
   id: string;
@@ -31,6 +61,7 @@ export type LobbyPlayer = {
 
 export type PlayerSnapshot = {
   role: "player";
+  kind: GameKind;
   stateVersion: number;
   phase: Phase;
   pin: string;
@@ -60,10 +91,13 @@ export type PlayerSnapshot = {
   /** During LEADERBOARD / ENDED. */
   leaderboard?: LeaderboardRow[];
   yourRank?: number;
+  /** Present when kind === "STORY". */
+  story?: StoryPlayerState;
 };
 
 export type HostSnapshot = {
   role: "host";
+  kind: GameKind;
   stateVersion: number;
   phase: Phase;
   pin: string;
@@ -87,6 +121,8 @@ export type HostSnapshot = {
   /** During REVEAL: why the correct answer matters. */
   explanation?: string;
   leaderboard?: LeaderboardRow[];
+  /** Present when kind === "STORY". */
+  story?: StoryHostState;
 };
 
 export type Snapshot = PlayerSnapshot | HostSnapshot;

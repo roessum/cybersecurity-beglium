@@ -11,7 +11,13 @@ enum GameStatus {
   QUESTION
   REVEAL
   LEADERBOARD
+  WRITING
   ENDED
+}
+
+enum GameKind {
+  QUIZ
+  STORY
 }
 
 model Quiz {
@@ -53,21 +59,55 @@ model Choice {
   @@unique([questionId, order])
 }
 
+model Story {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  icon         String?
+  difficulty   String?
+  /// How many trailing words the current writer can see (1 = only the previous word).
+  visibleWords Int      @default(1)
+  /// Optional word count at which the story auto-ends. Null = host stops manually.
+  targetWords  Int?
+  createdAt    DateTime @default(now())
+  games        Game[]
+}
+
 model Game {
   id                   String     @id @default(cuid())
   pin                  String     @unique
-  quizId               String
-  quiz                 Quiz       @relation(fields: [quizId], references: [id])
+  kind                 GameKind   @default(QUIZ)
+  quizId               String?
+  quiz                 Quiz?      @relation(fields: [quizId], references: [id])
+  storyId              String?
+  story                Story?     @relation(fields: [storyId], references: [id])
   status               GameStatus @default(LOBBY)
   currentQuestionIndex Int        @default(-1)
   questionStartedAt    DateTime?
+  /// STORY: the player whose turn it is to add the next word.
+  currentTurnPlayerId  String?
   stateVersion         Int        @default(0)
   hostToken            String
   createdAt            DateTime   @default(now())
   players              Player[]
   answers              PlayerAnswer[]
+  storyWords           StoryWord[]
 
   @@index([status])
+}
+
+model StoryWord {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  playerId  String
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  order     Int
+  text      String
+  createdAt DateTime @default(now())
+
+  @@unique([gameId, order])
+  @@index([gameId])
 }
 
 model Player {
@@ -80,6 +120,7 @@ model Player {
   joinedAt DateTime       @default(now())
   lastSeen DateTime       @default(now())
   answers  PlayerAnswer[]
+  storyWords StoryWord[]
 
   @@unique([gameId, nickname])
   @@index([gameId])

@@ -8,6 +8,7 @@ import { useHydrated, useLocalValue } from "@/lib/useClient";
 import { AnswerButton } from "@/components/AnswerButton";
 import { Leaderboard } from "@/components/Leaderboard";
 import { Brand } from "@/components/Brand";
+import { StoryPlayerView } from "@/components/StoryPlayerView";
 import type { PlayerSnapshot } from "@/lib/game/types";
 
 export function PlayerGame({ pin }: { pin: string }) {
@@ -77,6 +78,10 @@ export function PlayerGame({ pin }: { pin: string }) {
         <div className="animate-pulse text-slate-400">Connecting…</div>
       </Centered>
     );
+  }
+
+  if (data.kind === "STORY") {
+    return <StoryPlayerView pin={pin} data={data} playerId={playerId as string} />;
   }
 
   const answeredChoiceId = data.answered?.choiceId ?? localChoice;

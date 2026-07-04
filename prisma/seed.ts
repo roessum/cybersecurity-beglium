@@ -463,8 +463,26 @@ async function main() {
     });
   }
 
+  // Sample story game. Idempotent by title (Story has no unique key), so a
+  // second seed run leaves an existing story (and its live games) untouched.
+  const storyTitle = "Once Upon a Breach";
+  const existingStory = await prisma.story.findFirst({ where: { title: storyTitle } });
+  if (!existingStory) {
+    await prisma.story.create({
+      data: {
+        title: storyTitle,
+        description: "Everyone adds one word — but you only see the last one. Chaos guaranteed.",
+        icon: "🐙",
+        difficulty: "Beginner",
+        visibleWords: 1,
+        targetWords: null,
+      },
+    });
+  }
+
   console.log(`Seeded ${quizzes.length} department sessions:`);
   for (const q of quizzes) console.log(`  ${q.icon} ${q.department} — ${q.questions.length} questions (${q.difficulty})`);
+  console.log(`Seeded 1 story session: 🐙 ${storyTitle}`);
 }
 
 main()

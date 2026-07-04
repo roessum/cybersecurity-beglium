@@ -13,6 +13,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 import { Podium } from "@/components/Podium";
 import { Confetti } from "@/components/Confetti";
 import { AmbientBackground } from "@/components/AmbientBackground";
+import { StoryHostView } from "@/components/StoryHostView";
 import { useHostSounds } from "@/lib/useHostSounds";
 import { unlockAudio } from "@/lib/sound";
 import { answerStyle } from "@/lib/game/answerStyles";
@@ -43,7 +44,7 @@ export function HostView({ pin }: { pin: string }) {
   useHostSounds(data ?? null, muted);
 
   const control = useCallback(
-    async (action: "advance" | "end") => {
+    async (action: "advance" | "end" | "skip") => {
       if (!hostToken || busyRef.current) return;
       unlockAudio(); // browsers need a gesture before audio can play
       busyRef.current = true;
@@ -106,6 +107,10 @@ export function HostView({ pin }: { pin: string }) {
         </Link>
       </Centered>
     );
+  }
+
+  if (data?.kind === "STORY") {
+    return <StoryHostView data={data} control={control} busy={busy} />;
   }
 
   if (gone || data?.phase === "ENDED") {

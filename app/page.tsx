@@ -2,15 +2,20 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Brand } from "@/components/Brand";
 import { DepartmentCard } from "@/components/DepartmentCard";
+import { StoryCard } from "@/components/StoryCard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const quizzes = await prisma.quiz.findMany({
-    orderBy: { createdAt: "asc" },
-    include: { _count: { select: { questions: true } } },
-  });
+  const [quizzes, stories] = await Promise.all([
+    prisma.quiz.findMany({
+      orderBy: { createdAt: "asc" },
+      include: { _count: { select: { questions: true } } },
+    }),
+    prisma.story.findMany({ orderBy: { createdAt: "asc" } }),
+  ]);
+  const isEmpty = quizzes.length === 0 && stories.length === 0;
 
   return (
     <div className="grid-bg flex min-h-dvh flex-col">
@@ -72,7 +77,7 @@ export default async function Home() {
             </Link>
           </div>
 
-          {quizzes.length === 0 ? (
+          {isEmpty ? (
             <div className="rounded-2xl bg-white/5 p-6 text-slate-400 ring-1 ring-white/10">
               No sessions yet. Run <code className="text-cyan-300">npm run db:seed</code> to
               load the department quizzes.
@@ -90,6 +95,20 @@ export default async function Home() {
                     icon: q.icon,
                     difficulty: q.difficulty,
                     questionCount: q._count.questions,
+                  }}
+                />
+              ))}
+              {stories.map((s) => (
+                <StoryCard
+                  key={s.id}
+                  story={{
+                    id: s.id,
+                    title: s.title,
+                    description: s.description,
+                    icon: s.icon,
+                    difficulty: s.difficulty,
+                    visibleWords: s.visibleWords,
+                    targetWords: s.targetWords,
                   }}
                 />
               ))}

@@ -5,9 +5,11 @@ import { useState } from "react";
 
 export function CreateGameButton({
   quizId,
+  storyId,
   label = "Start hosting",
 }: {
-  quizId: string;
+  quizId?: string;
+  storyId?: string;
   label?: string;
 }) {
   const router = useRouter();
@@ -21,7 +23,7 @@ export function CreateGameButton({
       const res = await fetch("/api/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quizId }),
+        body: JSON.stringify(storyId ? { storyId } : { quizId }),
       });
       const data = await res.json();
       if (!res.ok) {

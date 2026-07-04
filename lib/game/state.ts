@@ -65,10 +65,30 @@ async function questionCount(quizId: string) {
  * LOBBY → QUESTION(0) → REVEAL → LEADERBOARD → QUESTION(1) → … → ENDED
  */
 export async function advanceGame(pin: string, hostToken: string) {
-  const game = await prisma.game.findUnique({ where: { pin } });
+  const game = await prisma.game.findUnique({
+    where: { pin },
+    include: { players: { orderBy: { joinedAt: "asc" }, select: { id: true } } },
+  });
   if (!game) throw new GameError("Game not found", 404);
   if (game.hostToken !== hostToken) throw new GameError("Not authorized", 403);
 
+  // Story games have their own flow: LOBBY → WRITING (turn-based) → ENDED.
+  // The only host "advance" is starting the game; words/skip/stop drive the rest.
+  if (game.kind === "STORY") {
+    if (game.status !== "LOBBY") return;
+    if (game.players.length === 0) throw new GameError("Wait for players to join", 400);
+    await prisma.game.update({
+      where: { id: game.id },
+      data: {
+        status: "WRITING",
+        currentTurnPlayerId: game.players[0].id,
+        stateVersion: { increment: 1 },
+      },
+    });
+    return;
+  }
+
+  if (!game.quizId) throw new GameError("Game has no quiz", 400);
   const total = await questionCount(game.quizId);
 
   const now = new Date();
@@ -99,6 +119,8 @@ export async function advanceGame(pin: string, hostToken: string) {
     }
     case "ENDED":
       return; // terminal, no-op
+    default:
+      return; // WRITING is story-only, handled above
   }
 
   await prisma.game.update({
@@ -132,7 +154,7 @@ export async function submitAnswer(pin: string, playerId: string, choiceId: stri
       },
     },
   });
-  if (!game) throw new GameError("Game not found", 404);
+  if (!game || !game.quiz) throw new GameError("Game not found", 404);
   if (game.status !== "QUESTION" || game.currentQuestionIndex < 0 || !game.questionStartedAt) {
     throw new GameError("Not accepting answers right now", 409);
   }

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { buildStoryHostSnapshot, buildStoryPlayerSnapshot } from "@/lib/game/story";
 import type {
   HostSnapshot,
   LeaderboardRow,
@@ -23,7 +24,7 @@ async function loadGame(pin: string) {
       players: { orderBy: { joinedAt: "asc" } },
     },
   });
-  if (!game) return null;
+  if (!game || !game.quiz) return null;
 
   const questions = game.quiz.questions;
   const currentQuestion =
@@ -34,7 +35,7 @@ async function loadGame(pin: string) {
       })
     : [];
 
-  return { game, questions, currentQuestion, currentAnswers };
+  return { game, quiz: game.quiz, questions, currentQuestion, currentAnswers };
 }
 
 /** Cheap poll used by the SSE loop to detect changes before rebuilding. */
@@ -83,17 +84,25 @@ function correctChoiceId(core: LoadedGame): string | undefined {
   return core.currentQuestion?.choices.find((c) => c.isCorrect)?.id;
 }
 
+async function gameKind(pin: string): Promise<"QUIZ" | "STORY" | null> {
+  const game = await prisma.game.findUnique({ where: { pin }, select: { kind: true } });
+  return game?.kind ?? null;
+}
+
 export async function buildHostSnapshot(pin: string): Promise<HostSnapshot | null> {
+  if ((await gameKind(pin)) === "STORY") return buildStoryHostSnapshot(pin);
+
   const core = await loadGame(pin);
   if (!core) return null;
-  const { game, questions, currentQuestion, currentAnswers } = core;
+  const { game, quiz, questions, currentQuestion, currentAnswers } = core;
 
   const snap: HostSnapshot = {
     role: "host",
+    kind: "QUIZ",
     stateVersion: game.stateVersion,
     phase: game.status,
     pin: game.pin,
-    quizTitle: game.quiz.title,
+    quizTitle: quiz.title,
     totalQuestions: questions.length,
     questionIndex: game.currentQuestionIndex,
     playerCount: game.players.length,
@@ -134,19 +143,22 @@ export async function buildPlayerSnapshot(
   pin: string,
   playerId: string
 ): Promise<PlayerSnapshot | null> {
+  if ((await gameKind(pin)) === "STORY") return buildStoryPlayerSnapshot(pin, playerId);
+
   const core = await loadGame(pin);
   if (!core) return null;
-  const { game, questions, currentQuestion, currentAnswers } = core;
+  const { game, quiz, questions, currentQuestion, currentAnswers } = core;
 
   const you = game.players.find((p) => p.id === playerId);
   if (!you) return null;
 
   const snap: PlayerSnapshot = {
     role: "player",
+    kind: "QUIZ",
     stateVersion: game.stateVersion,
     phase: game.status,
     pin: game.pin,
-    quizTitle: game.quiz.title,
+    quizTitle: quiz.title,
     totalQuestions: questions.length,
     questionIndex: game.currentQuestionIndex,
     playerCount: game.players.length,
